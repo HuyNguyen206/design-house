@@ -21,7 +21,7 @@ class UserResource extends JsonResource
                     'created_at' => $this->created_at->format('d-m-Y h:i:s')
                 ]
             ], $this->only(['id', 'username', 'email', 'name',
-            'formatted_address', 'tagline', 'about', 'location',
+            'formatted_address', 'tag_line', 'about', 'location',
             'available_to_hire']));
     }
 }
