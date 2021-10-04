@@ -16,7 +16,6 @@ class UploadController extends Controller
         ]);
 
         $image = \request()->file('image');
-        $imagePath = $image->getPathname();
         $fileName = time()."_".preg_replace('/\s+/', '_', strtolower($image->getClientOriginalName()));
 //        $tmp = $image->storeAs('uploads/original', $fileName, 'tmp');
 
