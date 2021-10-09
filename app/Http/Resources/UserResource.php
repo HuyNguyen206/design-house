@@ -15,13 +15,14 @@ class UserResource extends JsonResource
     public function toArray($request)
     {
         return array_merge(
+             $this->only(['id', 'username', 'email', 'name',
+            'formatted_address', 'tag_line', 'about', 'location',
+            'available_to_hire']),
             [
                 'create_dates' => [
                     'created_at_human' => $this->created_at->diffForHumans(),
                     'created_at' => $this->created_at->format('d-m-Y h:i:s')
                 ]
-            ], $this->only(['id', 'username', 'email', 'name',
-            'formatted_address', 'tag_line', 'about', 'location',
-            'available_to_hire']));
+            ]);
     }
 }
