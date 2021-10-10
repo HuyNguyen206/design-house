@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
+use App\Repositories\Contracts\UserInterface;
 use App\Rules\MatchOldPassword;
 use Grimzy\LaravelMysqlSpatial\Types\Point;
 use Illuminate\Http\Request;
@@ -11,6 +12,11 @@ use Illuminate\Support\Facades\Auth;
 
 class SettingController extends Controller
 {
+    public $userRepository;
+    public function __construct(UserInterface $userRepository)
+    {
+        $this->userRepository  = $userRepository;
+    }
     //
     public function updateProfile()
     {

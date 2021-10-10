@@ -7,6 +7,10 @@ use App\Http\Resources\DesignResource;
 use App\Jobs\UploadImage;
 use App\Models\Design;
 use App\Repositories\Contracts\DesignInterface;
+use App\Repositories\Eloquent\Criteria\ApplyEagerLoading;
+use App\Repositories\Eloquent\Criteria\FilterByWhereField;
+use App\Repositories\Eloquent\Criteria\IsLive;
+use App\Repositories\Eloquent\Criteria\Latest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -14,16 +18,27 @@ use Illuminate\Support\Str;
 class UploadController extends Controller
 {
     public $designRepository;
+
     public function __construct(DesignInterface $designRepository)
     {
-        $this->designRepository  = $designRepository;
+        $this->designRepository = $designRepository;
     }
 
     public function index()
     {
-        $designs =  $this->designRepository->paginate();
+        $designs = $this->designRepository->withCriteria([
+            new ApplyEagerLoading('user.designs'),
+            new Latest(),
+            new FilterByWhereField('is_live', true)
+        ])->all();
         return response()->success(DesignResource::collection($designs)->response()->getData());
     }
+
+    public function findDesignById($id)
+    {
+        return response()->success(new DesignResource($this->designRepository->find($id)));
+    }
+
     //
     public function upload()
     {
@@ -32,31 +47,33 @@ class UploadController extends Controller
         ]);
 
         $image = \request()->file('image');
-        $fileName = time()."_".preg_replace('/\s+/', '_', strtolower($image->getClientOriginalName()));
-//        $tmp = $image->storeAs('uploads/original', $fileName, 'tmp');
-
-        $design = auth()->user()->designs()->create([
-//            'image' => $tmp,
-            'disk' => config('filesystems.default')
+        $fileName = time() . "_" . preg_replace('/\s+/', '_', strtolower($image->getClientOriginalName()));
+        $design = $this->designRepository->create([
+            'disk' => config('filesystems.default'),
+            'user_id' => auth()->id()
         ]);
+//        $design = auth()->user()->designs()->create([
+//            'disk' => config('filesystems.default')
+//        ]);
         $this->dispatch(new UploadImage($design, $fileName, $image));
         return response()->success($design, 'Upload successfully!');
     }
 
-    public function updateDesignInfo(Design $design)
+    public function updateDesignInfo($id)
     {
         //        if (auth()->user()->cannot('update', $design)) {
 //            return response()->error('You are not the owner of this design');
 //        }
+        $design = $this->designRepository->find($id);
         $this->authorize('update', $design);
         $data = \request()->validate([
-           'title' => 'required|min:3',
-           'description' => 'required|min:10',
+            'title' => 'required|min:3',
+            'description' => 'required|min:10',
             'tags' => 'required'
         ]);
         $design->retag($data['tags']);
         unset($data['tags']);
-        $data['slug'] =Str::slug($data['title']);
+        $data['slug'] = Str::slug($data['title']);
         $data['is_live'] = $design->upload_success;
         $design->update($data);
 
@@ -64,8 +81,9 @@ class UploadController extends Controller
 
     }
 
-    public function deleteDesign(Design $design)
+    public function deleteDesign($id)
     {
+        $design = $this->designRepository->find($id);
         $this->authorize('delete', $design);
         Storage::disk($design->disk)->delete([
             $design->image,
@@ -73,7 +91,6 @@ class UploadController extends Controller
             Str::replace('original', 'thumbnail', $design->image),
         ]);
         $design->delete();
-
         return response()->success([], 'Delete successfully');
 
     }

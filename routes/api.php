@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('me', [MeController::class, 'getMe']);
 Route::get('users', [UserController::class, 'index']);
 Route::get('designs', [UploadController::class, 'index']);
+Route::get('designs/{id}', [UploadController::class, 'findDesignById']);
 
 //Route for logined user
 Route::middleware('auth:api')->group(function () {

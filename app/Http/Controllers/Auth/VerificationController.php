@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use App\Repositories\Contracts\UserInterface;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Http\Request;
@@ -13,16 +14,18 @@ use Symfony\Component\HttpFoundation\Response;
 
 class VerificationController extends Controller
 {
+    public $userRepository;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(UserInterface $userRepository)
     {
 //        $this->middleware('auth');
 //        $this->middleware('signed')->only('verify');
+        $this->userRepository = $userRepository;
         $this->middleware('throttle:6,1')->only('verify', 'resend');
     }
 
@@ -45,8 +48,8 @@ class VerificationController extends Controller
         $request->validate([
            'email' => 'email|required'
         ]);
-
-        $user = User::query()->whereEmail($request->email)->first();
+        $user = $this->userRepository->findWhereFirst('email', $request->email);
+//        $user = User::query()->whereEmail($request->email)->first();
         if (!$user) {
             return \response()->error('No user could be found with this email address');
         }

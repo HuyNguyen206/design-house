@@ -14,4 +14,5 @@ class DesignRepository extends BaseRepository implements \App\Repositories\Contr
         return Design::class;
     }
 
+
 }
