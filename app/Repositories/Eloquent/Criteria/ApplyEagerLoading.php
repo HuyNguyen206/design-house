@@ -9,10 +9,9 @@ class ApplyEagerLoading implements CriterionInterface
 
     /**
      * FilterByWhereField constructor.
-     * @param $column
-     * @param $value
+     * @param array $relationship
      */
-    public function __construct($relationship)
+    public function __construct(array $relationship)
     {
         $this->relationship = $relationship;
     }
@@ -23,6 +22,9 @@ class ApplyEagerLoading implements CriterionInterface
      */
     public function apply($model)
     {
-       return $model->with($this->relationship);
+        foreach ($this->relationship as $relation) {
+            $model = $model->with($relation);
+        }
+       return $model;
     }
 }

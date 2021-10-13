@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Design\UploadController;
+use App\Http\Controllers\User\CommentController;
 use App\Http\Controllers\User\MeController;
 use App\Http\Controllers\User\SettingController;
 use App\Http\Controllers\User\UserController;
@@ -36,7 +37,10 @@ Route::middleware('auth:api')->group(function () {
     Route::post('designs', [UploadController::class, 'upload']);
     Route::put('designs/{design}', [UploadController::class, 'updateDesignInfo']);
     Route::delete('designs/{design}', [UploadController::class, 'deleteDesign']);
-
+    Route::post('comments', [CommentController::class, 'createComment']);
+    Route::put('comments/{id}', [CommentController::class, 'updateComment']);
+    Route::delete('comments/{id}', [CommentController::class, 'deleteComment']);
+Route::post('likes/toggle/{id}/{type}', [UserController::class, 'likeToggleAction']);
 });
 
 Route::middleware('guest')->group(function () {

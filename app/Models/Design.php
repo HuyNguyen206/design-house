@@ -2,15 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Likeable;
+use App\Repositories\Contracts\CommentInterface;
+use App\Repositories\Eloquent\Criteria\FilterByWhereIn;
 use Cviebrock\EloquentTaggable\Taggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Design extends Model
 {
-    use HasFactory, Taggable;
+    use HasFactory, Taggable, Likeable;
 
     protected $fillable = [
         'user_id',
@@ -43,4 +47,26 @@ class Design extends Model
           'thumbnail_image' => $this->getImageUrl('thumbnail')
         ];
     }
+
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    protected static function booted()
+    {
+      static::deleted(function($design) {
+          $comments = $design->comments();
+          $likedUsers = $design->likedUsers;
+          if ($comments->count()) {
+              $comments->delete();
+          }
+
+          if ($likedUsers->count()) {
+             $likeRecordIds = $likedUsers->pluck('pivot')->pluck('id')->toArray();
+             DB::table('likeables')->whereIn('id', $likeRecordIds)->delete();
+          }
+      });
+    }
+
 }

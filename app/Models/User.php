@@ -5,6 +5,9 @@ namespace App\Models;
 use App\Notifications\ResetPassword;
 use Grimzy\LaravelMysqlSpatial\Eloquent\SpatialTrait;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -90,4 +93,31 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     {
         return $this->hasMany(Design::class);
     }
+
+
+    public function likedComments()
+    {
+        return $this->morphedByMany(Comment::class, 'likeable')->withTimestamps();
+    }
+
+
+    public function likedDesigns()
+    {
+        return $this->morphedByMany(Design::class, 'likeable')->withTimestamps();
+    }
+
+    public function likeToggle(int $id, string $type)
+    {
+        $this->{"liked$type"}()->toggle($id);
+    }
+
+    public function isLike($id, $type)
+    {
+        $typeTable = Str::of($type)->lower();
+        if (!DB::table($typeTable)->where('id', $id)->exists()) {
+            throw new ModelNotFoundException("Model $type $id not exist");
+        }
+       return $this->{"liked$type"}()->where("$typeTable.id", $id)->exists();
+    }
+
 }

@@ -16,16 +16,21 @@ class DesignResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user' => new UserResource($this->user),
+            'user' => new UserResource($this->whenLoaded('user')),
             'title' => $this->title,
             'slug' => $this->slug,
             'is_live' => $this->is_live,
+            'like' => [
+              'count' => $this->whenLoaded('likedUsers')->count(),
+              'like_user' =>  $this->whenLoaded('likedUsers')
+            ],
             'description' => $this->description,
             'images' => $this->images,
             'tag_list' =>  [
                 'tags' => $this->tagArray,
                 'normalize' => $this->tagArrayNormalized
             ],
+            'comments' => CommentResource::collection($this->whenLoaded('comments')),
             'create_dates' => [
                 'created_at_human' => $this->created_at->diffForHumans(),
                 'created_at' => $this->created_at->format('d-m-Y h:i:s')

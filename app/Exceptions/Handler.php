@@ -45,7 +45,7 @@ class Handler extends ExceptionHandler
     {
         if ($e instanceof AuthorizationException) {
             if ($request->expectsJson()) {
-                return response()->error('You are not the owner of this design', 403, 403);
+                return response()->error('You are not authorize to access this resource', 403, 403);
             }
         }
 

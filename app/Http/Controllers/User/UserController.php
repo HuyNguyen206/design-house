@@ -7,6 +7,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Repositories\Contracts\UserInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -21,5 +22,15 @@ class UserController extends Controller
     {
         $users = $this->userRepository->paginate();
         return response()->success(UserResource::collection($users)->response()->getData());
+    }
+
+    public function likeToggleAction($id, $type)
+    {
+        $type = Str::of($type)->ucfirst()->plural();
+        $user = auth()->user();
+        $action = $user->isLike($id, $type) ? 'Unlike' : 'Like';
+
+        $user->likeToggle($id, Str::ucfirst($type));
+        return response()->success([], "$action $type successfully");
     }
 }

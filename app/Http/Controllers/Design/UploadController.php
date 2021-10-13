@@ -27,7 +27,7 @@ class UploadController extends Controller
     public function index()
     {
         $designs = $this->designRepository->withCriteria([
-            new ApplyEagerLoading('user.designs'),
+            new ApplyEagerLoading(['user.designs', 'comments', 'likedUsers']),
             new Latest(),
             new FilterByWhereField('is_live', true)
         ])->all();
@@ -36,7 +36,9 @@ class UploadController extends Controller
 
     public function findDesignById($id)
     {
-        return response()->success(new DesignResource($this->designRepository->find($id)));
+        return response()->success(new DesignResource($this->designRepository->withCriteria([
+            new ApplyEagerLoading(['comments', 'likedUsers']),
+        ])->find($id)));
     }
 
     //
