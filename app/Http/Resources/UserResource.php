@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Design;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
@@ -25,7 +26,7 @@ class UserResource extends JsonResource
                 ]
             ],
         [
-            'design' => $this->designs,
+            'designs' => $this->whenLoaded('designs'),
         ]);
     }
 }

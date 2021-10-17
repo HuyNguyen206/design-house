@@ -12,6 +12,7 @@ use App\Repositories\Eloquent\Criteria\FilterByWhereField;
 use App\Repositories\Eloquent\Criteria\IsLive;
 use App\Repositories\Eloquent\Criteria\Latest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -71,10 +72,12 @@ class UploadController extends Controller
         $data = \request()->validate([
             'title' => 'required|min:3',
             'description' => 'required|min:10',
-            'tags' => 'required'
+            'tags' => 'required',
+            'assign_to_team' => 'required|boolean',
+            'team_id' => 'required_if:assign_to_team,true'
         ]);
         $design->retag($data['tags']);
-        unset($data['tags']);
+        $data = Arr::except($data, ['tags', 'assign_to_team']);
         $data['slug'] = Str::slug($data['title']);
         $data['is_live'] = $design->upload_success;
         $design->update($data);

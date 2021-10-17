@@ -5,7 +5,10 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\VerificationController;
+use App\Http\Controllers\Chat\ChatController;
 use App\Http\Controllers\Design\UploadController;
+use App\Http\Controllers\Team\InvitationController;
+use App\Http\Controllers\Team\TeamController;
 use App\Http\Controllers\User\CommentController;
 use App\Http\Controllers\User\MeController;
 use App\Http\Controllers\User\SettingController;
@@ -28,6 +31,7 @@ Route::get('me', [MeController::class, 'getMe']);
 Route::get('users', [UserController::class, 'index']);
 Route::get('designs', [UploadController::class, 'index']);
 Route::get('designs/{id}', [UploadController::class, 'findDesignById']);
+Route::get('teams/slug/{slug}', [TeamController::class, 'findTeamBySlug']);
 
 //Route for logined user
 Route::middleware('auth:api')->group(function () {
@@ -41,6 +45,23 @@ Route::middleware('auth:api')->group(function () {
     Route::put('comments/{id}', [CommentController::class, 'updateComment']);
     Route::delete('comments/{id}', [CommentController::class, 'deleteComment']);
 Route::post('likes/toggle/{id}/{type}', [UserController::class, 'likeToggleAction']);
+Route::post('teams', [TeamController::class, 'store']);
+Route::get('teams/{id}', [TeamController::class, 'findTeamById']);
+Route::get('users/teams', [TeamController::class, 'fetchUserTeams']);
+Route::put('teams/{id}', [TeamController::class, 'update']);
+Route::delete('teams/{id}', [TeamController::class, 'destroy']);
+Route::delete('teams/{id}/users/{userId}', [TeamController::class, 'deleteUserFromTeam']);
+
+Route::post('invitations/{teamId}', [InvitationController::class, 'sendInvitation']);
+Route::post('invitations/{id}/resend', [InvitationController::class, 'resend']);
+Route::post('invitations/{id}/respond', [InvitationController::class, 'respond']);
+Route::delete('invitations/{id}', [InvitationController::class, 'deleteInvitation']);
+
+Route::post('chats', [ChatController::class, 'sendMessage']);
+Route::get('chats', [ChatController::class, 'getUserChats']);
+Route::get('chats/{id}/message', [ChatController::class, 'getChatMessage']);
+Route::put('chats/messages/{messageId}', [ChatController::class, 'markMessageAsRead']);
+Route::delete('messages/{id}', [ChatController::class, 'deleteMessage']);
 });
 
 Route::middleware('guest')->group(function () {

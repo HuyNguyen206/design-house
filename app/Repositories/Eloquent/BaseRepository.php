@@ -43,6 +43,11 @@ abstract class BaseRepository implements \App\Repositories\Contracts\BaseInterfa
         return $this->model->findOrFail($id);
     }
 
+    public function first()
+    {
+        return $this->model->first();
+    }
+
     public function findWhere($column, $value)
     {
         return $this->model->where($column, $value)->get();

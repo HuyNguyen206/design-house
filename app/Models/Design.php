@@ -18,6 +18,7 @@ class Design extends Model
 
     protected $fillable = [
         'user_id',
+        'team_id',
         'image',
         'title',
         'description',
@@ -63,10 +64,13 @@ class Design extends Model
           }
 
           if ($likedUsers->count()) {
-             $likeRecordIds = $likedUsers->pluck('pivot')->pluck('id')->toArray();
-             DB::table('likeables')->whereIn('id', $likeRecordIds)->delete();
+              $design->likedUsers()->detach();
           }
       });
     }
+
+    public function team()
+    {
+        return $this->belongsTo(Team::class);    }
 
 }

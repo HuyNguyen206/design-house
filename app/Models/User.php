@@ -113,11 +113,49 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 
     public function isLike($id, $type)
     {
-        $typeTable = Str::of($type)->lower();
+        $typeTable = Str::of($type)->lower()->plural();
+        $type = Str::of($typeTable)->ucfirst();
         if (!DB::table($typeTable)->where('id', $id)->exists()) {
             throw new ModelNotFoundException("Model $type $id not exist");
         }
        return $this->{"liked$type"}()->where("$typeTable.id", $id)->exists();
     }
+
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class)->withTimestamps();
+    }
+
+    public function ownTeams()
+    {
+        return $this->hasMany(Team::class, 'owner_id');
+    }
+
+    public function isOwnerOfTeam($teamId)
+    {
+        return $this->ownTeams()->where('id', $teamId)->exists();
+    }
+
+    public function sendInviteTeams()
+    {
+        return $this->belongsToMany(Team::class, 'invitations', 'sender_id');
+    }
+
+    public function chats()
+    {
+        return $this->belongsToMany(Chat::class, 'participants');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    public function getChatWithUser($userId)
+    {
+        $user = auth()->user();
+        return $user->chats()->where('participants.user_id', $userId)->first();
+    }
+
 
 }
