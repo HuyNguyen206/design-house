@@ -15,6 +15,11 @@ class CreateMessagesTable extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->text('body');
+            $table->unsignedBigInteger('chat_id');
+            $table->text('read_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

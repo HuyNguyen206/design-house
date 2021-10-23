@@ -143,7 +143,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 
     public function chats()
     {
-        return $this->belongsToMany(Chat::class, 'participants');
+        return $this->belongsToMany(Chat::class, 'participants')->withTimestamps();
     }
 
     public function messages()
@@ -154,7 +154,9 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     public function getChatWithUser($userId)
     {
         $user = auth()->user();
-        return $user->chats()->where('participants.user_id', $userId)->first();
+        return $user->chats()->whereHas('participants', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->first();
     }
 
 

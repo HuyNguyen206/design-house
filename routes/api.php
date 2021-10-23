@@ -32,7 +32,7 @@ Route::get('users', [UserController::class, 'index']);
 Route::get('designs', [UploadController::class, 'index']);
 Route::get('designs/{id}', [UploadController::class, 'findDesignById']);
 Route::get('teams/slug/{slug}', [TeamController::class, 'findTeamBySlug']);
-
+Route::get('search/design', [UploadController::class, 'searchDesign']);
 //Route for logined user
 Route::middleware('auth:api')->group(function () {
     Route::post('logout', [LoginController::class, 'logout']);
@@ -60,7 +60,7 @@ Route::delete('invitations/{id}', [InvitationController::class, 'deleteInvitatio
 Route::post('chats', [ChatController::class, 'sendMessage']);
 Route::get('chats', [ChatController::class, 'getUserChats']);
 Route::get('chats/{id}/message', [ChatController::class, 'getChatMessage']);
-Route::put('chats/messages/{messageId}', [ChatController::class, 'markMessageAsRead']);
+Route::put('chats/{id}', [ChatController::class, 'markChatAsRead']);
 Route::delete('messages/{id}', [ChatController::class, 'deleteMessage']);
 });
 

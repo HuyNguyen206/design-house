@@ -16,7 +16,7 @@ class UserResource extends JsonResource
     public function toArray($request)
     {
         return array_merge(
-             $this->only(['id', 'username', 'email', 'name',
+             $this->only(['id', 'username', 'name',
             'formatted_address', 'tag_line', 'about', 'location',
             'available_to_hire']),
             [
@@ -27,6 +27,9 @@ class UserResource extends JsonResource
             ],
         [
             'designs' => $this->whenLoaded('designs'),
+            $this->mergeWhen($this->id === auth()->id(), [
+                'email' => $this->email
+            ])
         ]);
     }
 }

@@ -100,4 +100,11 @@ class UploadController extends Controller
 
     }
 
+    public function searchDesign()
+    {
+        $arg =\request()->all();
+        $designs = $this->designRepository->search($arg);
+        return response()->success(DesignResource::collection($designs));
+    }
+
 }
