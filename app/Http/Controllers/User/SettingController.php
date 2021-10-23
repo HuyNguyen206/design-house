@@ -21,7 +21,7 @@ class SettingController extends Controller
     public function updateProfile()
     {
         $data = \request()->validate([
-            'name' => 'required',
+//            'name' => 'required',
             'tag_line' => 'string',
             'about' => 'string|min:20',
             'location.latitude' => 'required|numeric|min:-90|max:90',

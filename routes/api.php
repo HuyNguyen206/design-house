@@ -31,8 +31,10 @@ Route::get('me', [MeController::class, 'getMe']);
 Route::get('users', [UserController::class, 'index']);
 Route::get('designs', [UploadController::class, 'index']);
 Route::get('designs/{id}', [UploadController::class, 'findDesignById']);
+Route::get('designs/slug/{slug}', [UploadController::class, 'findDesignBySlug']);
 Route::get('teams/slug/{slug}', [TeamController::class, 'findTeamBySlug']);
 Route::get('search/design', [UploadController::class, 'searchDesign']);
+Route::get('search/designer', [UserController::class, 'searchDesigner']);
 //Route for logined user
 Route::middleware('auth:api')->group(function () {
     Route::post('logout', [LoginController::class, 'logout']);

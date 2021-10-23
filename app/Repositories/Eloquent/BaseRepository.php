@@ -45,7 +45,7 @@ abstract class BaseRepository implements \App\Repositories\Contracts\BaseInterfa
 
     public function first()
     {
-        return $this->model->first();
+        return $this->model->firstOrFail();
     }
 
     public function findWhere($column, $value)
@@ -80,5 +80,9 @@ abstract class BaseRepository implements \App\Repositories\Contracts\BaseInterfa
             $this->model = $criterion->apply($this->model);
         }
         return $this;
+    }
+
+    public function search(array $arg) {
+
     }
 }

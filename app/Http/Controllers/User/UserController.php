@@ -33,4 +33,10 @@ class UserController extends Controller
         $user->likeToggle($id, Str::ucfirst($type));
         return response()->success([], "$action $type successfully");
     }
+
+    public function searchDesigner()
+    {
+        $designers = $this->userRepository->search(\request()->all());
+        return response()->success(UserResource::collection($designers));
+    }
 }

@@ -107,4 +107,14 @@ class UploadController extends Controller
         return response()->success(DesignResource::collection($designs));
     }
 
+    public function findDesignBySlug($slug)
+    {
+        $design = $this->designRepository->withCriteria(
+                new FilterByWhereField('slug', $slug),
+                new FilterByWhereField('is_live', 1)
+        )->first();
+
+        return response()->success($design ? new DesignResource($design) : null);
+    }
+
 }
