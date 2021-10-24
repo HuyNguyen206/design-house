@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Team;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\DesignResource;
 use App\Http\Resources\TeamResource;
 use App\Repositories\Contracts\TeamInterface;
 use App\Repositories\Eloquent\Criteria\ApplyEagerLoading;
@@ -85,6 +86,12 @@ class TeamController extends Controller
         }
         $team->members()->detach($userId);
         return response()->success("The user $userId was remove successfully");
+    }
+
+    public function getDesignForTeam($id)
+    {
+        $designs = $this->teamRepo->find($id)->designs;
+        return response()->success(DesignResource::collection($designs));
     }
 
 }

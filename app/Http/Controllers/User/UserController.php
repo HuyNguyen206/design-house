@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\DesignResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Repositories\Contracts\UserInterface;
+use App\Repositories\Eloquent\Criteria\FilterByWhereField;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -38,5 +40,17 @@ class UserController extends Controller
     {
         $designers = $this->userRepository->search(\request()->all());
         return response()->success(UserResource::collection($designers));
+    }
+
+    public function getDesignsForUser($id)
+    {
+        $designs = $this->userRepository->find($id)->designs;
+        return response()->success(DesignResource::collection($designs));
+    }
+
+    public function findByUserName($userName)
+    {
+        $users = $this->userRepository->withCriteria(new FilterByWhereField('user_name', $userName))->all();
+        return response()->success(UserResource::collection($users));
     }
 }

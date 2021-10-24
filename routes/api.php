@@ -29,13 +29,17 @@ use Illuminate\Support\Facades\Route;
 //Public routes
 Route::get('me', [MeController::class, 'getMe']);
 Route::get('users', [UserController::class, 'index']);
+Route::get('users/find/{username}', [UserController::class, 'findByUserName']);
+Route::get('users/{id}/designs', [UserController::class, 'getDesignsForUser']);
 Route::get('designs', [UploadController::class, 'index']);
 Route::get('designs/{id}', [UploadController::class, 'findDesignById']);
 Route::get('designs/slug/{slug}', [UploadController::class, 'findDesignBySlug']);
 Route::get('teams/slug/{slug}', [TeamController::class, 'findTeamBySlug']);
+Route::get('teams/{id}/designs', [TeamController::class, 'getDesignForTeam']);
 Route::get('search/design', [UploadController::class, 'searchDesign']);
 Route::get('search/designer', [UserController::class, 'searchDesigner']);
-//Route for logined user
+
+//Route for authenticated user
 Route::middleware('auth:api')->group(function () {
     Route::post('logout', [LoginController::class, 'logout']);
     Route::put('setting/profile', [SettingController::class, 'updateProfile']);

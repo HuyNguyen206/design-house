@@ -46,6 +46,10 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         'remember_token',
     ];
 
+    protected $appends = [
+      'avatar_url'
+    ];
+
     /**
      * The attributes that should be cast.
      *
@@ -82,6 +86,12 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function getAvatarUrlAttribute()
+    {
+        $hashEmail = md5((string)Str::of($this->email)->trim()->lower());
+        return "https://www.gravatar.com/avatar/$hashEmail?d=mp";
     }
 
     public function sendPasswordResetNotification($token)
