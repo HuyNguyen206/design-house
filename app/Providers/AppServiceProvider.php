@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
 
             return Response::json([
                 'message' => $message,
-                'errors' => $errors,
+                'isSuccess' => true,
                 'data' => $data,
             ], $code);
         });
@@ -40,9 +40,11 @@ class AppServiceProvider extends ServiceProvider
             }
 
             return Response::json([
-                'errors'  => true,
+                'errors'  => [
+                    'message' => $message
+                ],
                 'code'    => $code,
-                'message' => $message,
+                'isSuccess' => false,
             ], $status);
         });
 
