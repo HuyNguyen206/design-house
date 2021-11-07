@@ -26,7 +26,7 @@ class UserResource extends JsonResource
                 ]
             ],
         [
-            'designs' => $this->whenLoaded('designs'),
+            'designs' => DesignResource::collection($this->whenLoaded('designs')) ,
             $this->mergeWhen($this->id === auth()->id(), [
                 'email' => $this->email
             ])

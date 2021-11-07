@@ -54,7 +54,7 @@ class DesignRepository extends BaseRepository implements \App\Repositories\Contr
                 $query->latest();
             }
         }
-        $query->with('likedUsers');
+        $query->with(['likedUsers', 'user', 'comments']);
         return $query->get();
     }
 }

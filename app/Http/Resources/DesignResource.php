@@ -29,11 +29,13 @@ class DesignResource extends JsonResource
                 'is_like_by_current_user' => $user ? $user->isLike($this->id, 'design') : null
             ],
             'team' => ($team = $this->team) ? [
+                'id' => $team->id,
                 'name' => $team->name,
                 'slug' => $team->slug
             ] : null,
             'description' => $this->description,
             'images' => $this->images,
+            'has_image' => (bool) $this->image,
             'tag_list' => [
                 'tags' => $this->tagArray,
                 'normalize' => $this->tagArrayNormalized

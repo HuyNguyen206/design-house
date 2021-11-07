@@ -25,12 +25,13 @@ class UploadImage implements ShouldQueue
      *
      * @param Design $design
      * @param $fileName
+     * @param $imagePath
      */
-    public function __construct(Design $design, $fileName, $image)
+    public function __construct(Design $design, $fileName, $imagePath)
     {
         $this->design = $design;
         $this->fileName = $fileName;
-        $this->imagePath = $image->storeAs('uploads/original', $this->fileName, 'public');
+        $this->imagePath = $imagePath;
     }
 
     /**

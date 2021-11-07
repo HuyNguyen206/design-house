@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\DesignResource;
 use App\Jobs\UploadImage;
 use App\Models\Design;
+use App\Models\User;
 use App\Repositories\Contracts\DesignInterface;
 use App\Repositories\Eloquent\Criteria\ApplyEagerLoading;
 use App\Repositories\Eloquent\Criteria\FilterByWhereField;
@@ -42,6 +43,12 @@ class UploadController extends Controller
         ])->find($id)));
     }
 
+    public function findDesignByIdAndUser($id)
+    {
+        $design = auth()->user()->designs()->with(['comments', 'likedUsers'])->where('id', $id)->firstOrFail();
+        return response()->success(new DesignResource($design));
+    }
+
     //
     public function upload()
     {
@@ -51,14 +58,16 @@ class UploadController extends Controller
 
         $image = \request()->file('image');
         $fileName = time() . "_" . preg_replace('/\s+/', '_', strtolower($image->getClientOriginalName()));
-        $design = $this->designRepository->create([
-            'disk' => config('filesystems.default'),
-            'user_id' => auth()->id()
-        ]);
 //        $design = auth()->user()->designs()->create([
 //            'disk' => config('filesystems.default')
 //        ]);
-        $this->dispatch(new UploadImage($design, $fileName, $image));
+        $imagePath = $image->storeAs('uploads/original', $fileName, 'public');
+        $design = $this->designRepository->create([
+            'disk' => config('filesystems.default'),
+            'user_id' => auth()->id(),
+            'image' => $imagePath
+        ]);
+        $this->dispatch(new UploadImage($design, $fileName, $imagePath));
         return response()->success($design, 'Upload successfully!');
     }
 
@@ -74,12 +83,12 @@ class UploadController extends Controller
             'description' => 'required|min:10',
             'tags' => 'required',
             'assign_to_team' => 'required|boolean',
-            'team_id' => 'required_if:assign_to_team,true'
+            'team_id' => 'required_if:assign_to_team,true',
+            'is_live' => ''
         ]);
         $design->retag($data['tags']);
         $data = Arr::except($data, ['tags', 'assign_to_team']);
         $data['slug'] = Str::slug($data['title']);
-        $data['is_live'] = $design->upload_success;
         $design->update($data);
 
         return response()->success(new DesignResource($design), 'Update info successfully');
@@ -111,7 +120,8 @@ class UploadController extends Controller
     {
         $design = $this->designRepository->withCriteria(
                 new FilterByWhereField('slug', $slug),
-                new FilterByWhereField('is_live', 1)
+//                new FilterByWhereField('is_live', 1),
+            new ApplyEagerLoading(['likedUsers', 'user.designs', 'comments'])
         )->first();
 
         return response()->success($design ? new DesignResource($design) : null);
